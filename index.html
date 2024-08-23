@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спа-салон</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <ul class="header-navigation">
+        <li class="header-navigation__item"><a href="#">Главная</a></li>
+        <li class="header-navigation__item"><a href="#">О нас</a></li>
+        <li class="header-navigation__item"><a href="#">Услуги</a></li>
+        <li class="header-navigation__item"><a href="#">Специальные предложения</a></li>
+        <li class="header-navigation__item"><a href="#">Галерея</a></li>
+        <li class="header-navigation__item"><a href="#">Отзывы</a></li>
+        <li class="header-navigation__item"><a href="#">Контакты</a></li>
+        <li class="header-navigation__item" id="logout-item" style="display: none;"><a href="#" id="logout-btn">Выйти</a></li> <!-- Logout Button -->
+    </ul>
+</nav>
+
+<div class="hero">
+    <h2>Добро пожаловать в наш спа-салон</h2>
+    <p>Окунитесь в мир расслабления и комфорта</p>
+
+    <div class="personal-discount">
+        <h3>Индивидуальная скидка!</h3>
+        <p>Ваша персональная скидка действует в течение <span id="time-left">24:00:00</span></p>
+    </div>
+
+    <div class="login-form" id="login-form">
+        <h2>Вход</h2>
+        <?php if (!empty($error)): ?>
+            <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
+        <?php endif; ?>
+        <form method="post">
+            <div class="container">
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password-login">Пароль:</label>
+                    <input type="password" id="password-login" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="birthday">Дата рождения:</label>
+                    <input type="date" id="birthday" name="birthday" required>
+                </div>
+                <div>
+                    <input type="submit" value="Войти">
+                </div>
+            </div>
+        </form>
+        <p>Нет аккаунта? <a href="register.php">Регистрация</a>.</p>
+    </div>
+
+    <div class="birthday-message">
+        <p id="birthday-msg"></p>
+        <p id="birthday-discount-msg"></p>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2023 Spa-Salon</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([.$?*|{}()[]\\\\\\\\/+^])/g, '\\\\\\\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    function setCookie(name, value, options = {}) {
+        options = {
+            path: '/',
+            ...options
+        };
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    }
+
+    let startTime = getCookie('startTime');
+    if (!startTime) {
+        startTime = new Date().toISOString();
+        setCookie('startTime', startTime, {'max-age': 86400}); // 24 часа в секундах
+    } else {
+        startTime = new Date(startTime);
+    }
+
+    function updateTimer() {
+        let now = new Date();
+        let distance = (24 * 60 * 60 * 1000) - (now - startTime);
+
+        if (distance < 0) {
+            document.getElementById('time-left').textContent = "00:00:00";
+            return;
+        }
+
+        let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        document.getElementById('time-left').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Birthday Handling
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const birthday = document.getElementById('birthday').value;
+        setCookie('birthday', birthday, {'max-age': 31536000}); // 1 год в секундах
+        // Simulate login success
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('logout-item').style.display = 'block';
+    }, false);
+
+    // Logout button handling
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        setCookie('startTime', '', {'max-age': -1}); // Remove cookie
+        document.location.href = 'index.html'; // Redirect to main page
+    });
+
+    function checkBirthday() {
+        const birthday = getCookie('birthday');
+        if (birthday) {
+            const today = new Date().toISOString().slice(0, 10); // Getting yyyy-mm-dd format of today.
+            if (birthday.slice(5) === today.slice(5)) { // Comparing mm-dd
+                const birthdayMsg = `С Днем Рождения! Вам доступна специальная скидка!`;
+                const birthdayDiscountMsg = `Ваш бонусный код: BDAY10.`;
+                document.getElementById('birthday-msg').textContent = birthdayMsg;
+                document.getElementById('birthday-discount-msg').textContent = birthdayDiscountMsg;
+            }
+        }
+    }
+    checkBirthday();
+
+    // Simulate already logged in user
+    if (getCookie('birthday')) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('logout-item').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

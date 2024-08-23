@@ -1,0 +1,84 @@
+@charset "UTF-8";
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #f8f9fa;
+    padding: 10px;
+    text-align: center;
+}
+
+header img {
+    max-width: 150px;
+}
+
+nav {
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.hero {
+    background-image: url('../photo/spa.png'); 
+    background-size: cover;
+    height: 100vh; /* Changed for better responsiveness */
+    display: flex; /* Use Flexbox for centering content */
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px; /* Optional: Add padding to the sides */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    width: 150px;
+}
+
+.services, .offers, .reviews, .newsletter, .contact {
+    padding: 20px;
+    text-align: center;
+}
+
+.services .service, .offers .offer, .reviews .review {
+    margin: 10px;
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 10px;
+    text-align: center;
+}
